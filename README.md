@@ -1,8 +1,10 @@
 # shoeblog
 Shoeblog is a tiny static HTML5 blogging engine written for Linux systems with a Busybox environment.
+
 # Installation
 
 You can simply drop the "shoeblog" shell script anywhere in your system's $PATH, preferably in /usr/local/bin.
+
 Basic usage
 -----------
 
