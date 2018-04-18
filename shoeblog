@@ -21,7 +21,7 @@
 #will reflect it.
 progname="$(basename $0)"
 progauthor="Tony Agudo"
-progweb="https://github.com/antoniusmisfit/omicron/"
+progweb="https://github.com/antoniusmisfit/shoeblog"
 
 do_help()
 {
