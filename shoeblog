@@ -1,0 +1,192 @@
+#!/bin/sh
+
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+
+#If you change the name of the executable, the directory structure of
+#and config file of any blog you create with the newly named script
+#will reflect it.
+progname="$(basename $0)"
+progauthor="Tony Agudo"
+progweb="https://github.com/antoniusmisfit/omicron/"
+
+do_help()
+{
+cat << EOF
+$progname: A tiny single-page HTML5 blog engine suitable for text-based browsers.
+
+Usages:
+$progname -OPTION [ARG]
+
+-edit postname	Create or edit an entry to a blog. If blog does not exist, it is created.
+-delete postname	Delete a specified blog entry and update the blog accordingly.
+-list			List the entry names and titles in the current blog.
+-command command	Pipe the output of a command into it's own blog entry.
+-config			Edit the blog configuration file and update the blog accordingly.
+-theme			Generate a new CSS theme for the blog.
+-help			Show this help page.
+
+Notes:
+When creating a new entry to the blog, $progname uses the first line of the file as the title of the entry, and from the third to last line as the post body. Also, all options have an first letter form.
+Website: $progweb
+EOF
+}
+
+get_config()
+{
+if [ -e ./.$progname.config ];then
+	source ./.$progname.config
+else
+	cat > ./.$progname.config << EOF
+blogtitle="untitled"
+blogauthor="$(whoami)"
+font="sans"
+css="light"
+#If using Busybox httpd applet, use http://127.0.0.1:8000 for webroot
+webroot="http://localhost:8000"
+EOF
+	source ./.$progname.config
+fi
+}
+
+init_blog()
+{
+get_config
+#A couple of CSS themes for the blog. Feel free to create your own as you see fit.
+if [ ! -e ./.$progname/ ];then
+	mkdir -p ./.$progname
+fi
+cat > ./.$progname/light.css << EOF
+html{font-family: "$font";background-color: white;color: black}
+#rss{text-align: center;color: orange}
+#footer,#header,#nav{text-align: center;color: white;background-color: royalblue}
+EOF
+cat > ./.$progname/dark.css << EOF
+html{font-family: "$font";background-color: black;color: white}
+#rss{text-align: center;color: orange}
+#footer,#header,#nav{text-align: center;color: white;background-color: darkred}
+EOF
+}
+
+gen_index()
+{
+cat > ./index.html << EOF
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$blogtitle</title>
+<link rel="stylesheet" type="text/css" href="$webroot/.$progname/$css.css">
+</head>
+<body>
+<div id="header">$blogtitle</div>
+<pre>
+EOF
+for eachfile in $(ls -c ./.$progname/*.raw); do
+if [ -e $eachfile ];then
+cat >> ./index.html << EOF
+<article id="$(basename $eachfile .raw)">
+<a href="#$(basename $eachfile .raw)"><strong>$(head -n 1 $eachfile)</strong></a>
+by $blogauthor on $(stat -c "%y" $eachfile)
+
+$(cat $eachfile | tail -n +3)
+Share: <a href="https://www.facebook.com/sharer/sharer.php?u=$webroot/index.html#$(basename $eachfile .raw)">[Facebook]</a> <a href="https://twitter.com/share?url=$webroot/index.html#$(basename $eachfile .raw)">[Twitter]</a>
+</article>
+EOF
+fi
+done
+cat >> ./index.html << EOF
+</pre>
+<div id ="footer">
+Powered by $progname. Copyright &copy; 2015-$(date "+%Y") <a href="$progweb" target="_blank">$progauthor</a>
+</div>
+<div id="rss">
+<a href="$webroot/.$progname/rss.xml">RSS</a>
+</div>
+</body>
+</html>
+EOF
+}
+
+gen_rss()
+{
+get_config
+cat > ./.$progname/rss.xml << EOF
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+<channel>
+<title>$blogtitle</title>
+<link>$webroot</link>
+<description>$blogtitle</description>
+<language>en-us</language>
+EOF
+for eachfile in $(ls -c ./.$progname/*.raw);do
+cat >> ./.$progname/rss.xml << EOF
+<item>
+<title>$(head -n 1 $eachfile)</title>
+<link>$webroot/index.html#$(basename $eachfile .raw)</link>
+<description>$(tail -n +3 $eachfile | head -n 3)</description>
+<guid>$webroot/index.html#$(basename $eachfile .raw)</guid>
+</item>
+EOF
+done
+cat >> ./.$progname/rss.xml << EOF
+</channel>
+</rss>
+EOF
+}
+
+do_command()
+{
+mkdir -p ./.$progname
+entryfile="./.$progname/cmd-$(date "+%s").raw"
+cat > $entryfile << EOF
+Output of "$*"
+command log
+$($1)
+EOF
+}
+
+gen_css_theme()
+{
+get_config
+cat >./.$progname/$1.css << EOF
+html{font-family: "$font";background-color: white;color: black}
+#rss{text-align: center;color: orange}
+#footer,#header,#nav{text-align: center;color: white;background-color: royalblue}
+EOF
+echo "./.$progname/$1.css created! Please edit this file to your liking."
+}
+
+if [ $# -lt 1 ];then
+	do_help;
+	exit;
+fi
+
+case "$1" in
+	-e|-edit) mkdir -p ./.$progname;vi .$progname/$2.raw;;
+	-d|-delete) rm ./.$progname/$2.raw;;
+	-c|-config) get_config;vi ./.$progname.config;;
+	-C|-command) do_command "$2";;
+	-l|-list) for eachfile in ./.$progname/*.raw;do echo "$(basename $eachfile .raw) - $(head -n1 $eachfile)";done;exit;;
+	-t|-theme) gen_css_theme "$2";exit;;
+	*) do_help;exit;;
+esac
+
+init_blog
+gen_index
+gen_rss
