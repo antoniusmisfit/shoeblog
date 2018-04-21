@@ -33,6 +33,7 @@ $progname -OPTION [ARG]
 
 -edit postname	Create or edit an entry to a blog. If blog does not exist, it is created.
 -delete postname	Delete a specified blog entry and update the blog accordingly.
+-import txtfile		Import a text file into it's own blog post.
 -list			List the entry names and titles in the current blog.
 -command command	Pipe the output of a command into it's own blog entry.
 -config			Edit the blog configuration file and update the blog accordingly.
@@ -180,6 +181,7 @@ fi
 case "$1" in
 	-e|-edit) mkdir -p ./.$progname;vi .$progname/$2.raw;;
 	-d|-delete) rm ./.$progname/$2.raw;;
+	-i|-import) mkdir -p ./.$progname;cp $2 ./.$progname/$(basename $2 .txt).raw;;
 	-c|-config) get_config;vi ./.$progname.config;;
 	-C|-command) do_command "$2";;
 	-l|-list) for eachfile in ./.$progname/*.raw;do echo "$(basename $eachfile .raw) - $(head -n1 $eachfile)";done;exit;;
