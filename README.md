@@ -13,3 +13,9 @@ To automatically generate an empty blog within the current directory, invoke `sh
 To create your first blog post, invoke `shoeblog -edit postname` and edit the entry in vim. See `shoeblog -help` for details on blog post format.
 
 To delete a blog post, invoke `shoeblog -delete postname`, and shoeblog will delete the corresponding .raw files.
+
+TODO
+----
+
+* Emulate fmt command to properly format blog posts on index.html.
+* Add an import command to import a text file.
