@@ -36,9 +36,12 @@ EOF
 }
 
 if [ $# -eq 1 ];then
+	case "$1" in
+		-h) do_help;exit;;
+	esac
 	title="untitled"
 elif [ $# -eq 2 ];then
-	title="$2"
+	title="$1"
 fi
 
 cat << EOF
