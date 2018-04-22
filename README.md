@@ -14,8 +14,11 @@ To create your first blog post, invoke `shoeblog -edit postname` and edit the en
 
 To delete a blog post, invoke `shoeblog -delete postname`, and shoeblog will delete the corresponding .raw files.
 
+# HTMLwrap-bb
+
+HTMLwrap-bb is a stripped down Busybox compatible version of HTMLwrap.sh(found [here](https://github.com/antoniusmisfit/omicron)).
+
 TODO
 ----
 
-* Emulate fmt command to properly format blog posts on index.html.
-* Add an import command to import a text file.
+* Emulate fmt command to properly format blog posts on index.html and format text files for HTMLwrap-bb.
