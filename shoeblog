@@ -104,7 +104,7 @@ cat >> ./index.html << EOF
 <a href="#$(basename $eachfile .raw)"><strong>$(head -n 1 $eachfile)</strong></a>
 by $blogauthor on $(stat -c "%y" $eachfile)
 
-$(cat $eachfile | tail -n +3)
+$(cat $eachfile | tail -n +3|fold -s)
 Share: <a href="https://www.facebook.com/sharer/sharer.php?u=$webroot/index.html#$(basename $eachfile .raw)">[Facebook]</a> <a href="https://twitter.com/share?url=$webroot/index.html#$(basename $eachfile .raw)">[Twitter]</a>
 </article>
 EOF

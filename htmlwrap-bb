@@ -18,7 +18,7 @@
 progname="$(basename $0)"
 progauthor="Tony Agudo"
 progweb="https://github.com/antoniusmisfit/shoeblog/"
-fmtcmd="cat"
+fmtcmd="fold -s"
 infile="${!#}"
 title=
 

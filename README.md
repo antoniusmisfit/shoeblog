@@ -21,4 +21,4 @@ HTMLwrap-bb is a stripped down Busybox compatible version of HTMLwrap.sh(found [
 TODO
 ----
 
-* Emulate fmt command to properly format blog posts on index.html and format text files for HTMLwrap-bb.
+* Emulate fmt command to properly format blog posts on index.html and format text files for HTMLwrap-bb.(using fold command does the trick)
