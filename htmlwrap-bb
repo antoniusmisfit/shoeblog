@@ -64,7 +64,7 @@ html{font-family: "sans";background-color: white;color: black}
 `$fmtcmd $infile`
 </pre>
 <div id ="footer">
-Powered by $progname. Copyright &copy; 2016-$(date "+%Y") <a href="$progweb" target="_blank">$progauthor</a>
+Powered by $progname. Copyright &copy; 2018-$(date "+%Y") <a href="$progweb" target="_blank">$progauthor</a>
 </div>
 </body>
 </html>

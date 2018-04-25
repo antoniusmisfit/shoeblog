@@ -113,7 +113,7 @@ done
 cat >> ./index.html << EOF
 </pre>
 <div id ="footer">
-Powered by $progname. Copyright &copy; 2015-$(date "+%Y") <a href="$progweb" target="_blank">$progauthor</a>
+Powered by $progname. Copyright &copy; 2018-$(date "+%Y") <a href="$progweb" target="_blank">$progauthor</a>
 </div>
 <div id="rss">
 <a href="$webroot/.$progname/rss.xml">RSS</a>
