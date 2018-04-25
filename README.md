@@ -7,7 +7,8 @@ You can simply drop the "shoeblog" shell script anywhere in your system's $PATH,
 
 # Features
 
-Shoeblog features simple configuration, zero dependencies other than Busybox(or any sh-compatible shell), output suitable for text-based web browsers, and social media sharing for posts, CSS themes, command output capture to blog posts, and import of plain text files into blog posts..
+Shoeblog features simple configuration, zero dependencies other than Busybox(or any sh-compatible shell), output suitable for text-based web browsers, and social media sharing for posts, CSS themes, command output capture to blog posts, and import of plain text files into blog posts.
+
 Basic usage
 -----------
 
