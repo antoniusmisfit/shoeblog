@@ -71,12 +71,12 @@ if [ ! -e ./.$progname/ ];then
 	mkdir -p ./.$progname
 fi
 cat > ./.$progname/light.css << EOF
-html{font-family: "$font";background-color: white;color: black}
+html{margin: 1em auto;max-width:40em;font:1.2em/1.62 $font;background-color: white;color: black}
 #rss{text-align: center;color: orange}
 #footer,#header,#nav{text-align: center;color: white;background-color: royalblue}
 EOF
 cat > ./.$progname/dark.css << EOF
-html{font-family: "$font";background-color: black;color: white}
+html{margin: 1em auto;max-width:40em;font:1.2em/1.62 $font;background-color: black;color: white}
 #rss{text-align: center;color: orange}
 #footer,#header,#nav{text-align: center;color: white;background-color: darkred}
 EOF
