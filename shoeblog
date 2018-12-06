@@ -41,7 +41,7 @@ $progname -OPTION [ARG]
 -help			Show this help page.
 
 Notes:
-When creating a new entry to the blog, $progname uses the first line of the file as the title of the entry, and from the third to last line as the post body. Also, all options have an first letter form.
+When creating a new entry to the blog, $progname uses the first line of the file as the title of the entry, and from the third to last line as the post body. Also, all options have an first letter form(The -command option's first letter form is -C).
 Website: $progweb
 EOF
 }
