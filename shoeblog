@@ -4,17 +4,16 @@
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
-#
 
 #If you change the name of the executable, the directory structure of
 #and config file of any blog you create with the newly named script
@@ -45,22 +44,27 @@ When creating a new entry to the blog, $progname uses the first line of the file
 Website: $progweb
 EOF
 }
-
-get_config()
+make_config()
 {
-if [ -e ./.$progname.config ];then
-	source ./.$progname.config
-else
-	cat > ./.$progname.config << EOF
+cat > ./.$progname.config << EOF
 blogtitle="untitled"
 blogauthor="$(whoami)"
 font="sans"
 css="light"
 #If using Busybox httpd applet, use http://127.0.0.1:8000 for webroot
+#If you're not using a webserver at all, use "." for webroot
 webroot="http://localhost:8000"
 EOF
-	source ./.$progname.config
+}
+
+get_config()
+{
+if [ -e ./.$progname.config ];then
+	clear > /dev/null
+else
+	make_config
 fi
+source ./.$progname.config
 }
 
 init_blog()
@@ -82,10 +86,13 @@ html{margin: 1em auto;max-width:40em;font:1.2em/1.62 $font;background-color: bla
 #footer,#header,#nav{text-align: center}
 pre{border-top:solid;border-bottom:solid}
 EOF
+gen_index
+gen_rss
 }
 
 gen_index()
 {
+get_config
 cat > ./index.html << EOF
 <!doctype html>
 <html>
@@ -175,22 +182,25 @@ EOF
 echo "./.$progname/$1.css created! Please edit this file to your liking."
 }
 
+list_entries()
+{
+for eachfile in ./.$progname/*.raw;do
+	echo "$(basename $eachfile .raw) - $(head -n1 $eachfile)"
+done
+}
+
 if [ $# -lt 1 ];then
 	do_help;
 	exit;
 fi
 
 case "$1" in
-	-e|-edit) mkdir -p ./.$progname;vi .$progname/$2.raw;;
-	-d|-delete) rm ./.$progname/$2.raw;;
-	-i|-import) mkdir -p ./.$progname;cp $2 ./.$progname/$(basename $2 .txt).raw;;
+	-e|-edit) mkdir -p ./.$progname;vi .$progname/$2.raw;init_blog;;
+	-d|-delete) rm ./.$progname/$2.raw;init_blog;;
+	-i|-import) mkdir -p ./.$progname;cp $2 ./.$progname/$(basename $2 .txt).raw;init_blog;;
 	-c|-config) get_config;vi ./.$progname.config;;
-	-C|-command) do_command "$2";;
-	-l|-list) for eachfile in ./.$progname/*.raw;do echo "$(basename $eachfile .raw) - $(head -n1 $eachfile)";done;exit;;
-	-t|-theme) gen_css_theme "$2";exit;;
-	*) do_help;exit;;
+	-C|-command) do_command "$2";init_blog;;
+	-l|-list) list_entries;;
+	-t|-theme) gen_css_theme "$2";;
+	*) do_help;;
 esac
-
-init_blog
-gen_index
-gen_rss
