@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -32,10 +32,9 @@ $progname -OPTION [ARG]
 
 -edit postname	Create or edit an entry to a blog. If blog does not exist, it is created.
 -delete postname	Delete a specified blog entry and update the blog accordingly.
--import txtfile		Import a text file into it's own blog post.
 -list			List the entry names and titles in the current blog.
 -command command	Pipe the output of a command into it's own blog entry.
--config			Edit the blog configuration file and update the blog accordingly.
+-config			Set the blog configuration file and update the blog accordingly.
 -theme			Generate a new CSS theme for the blog.
 -help			Show this help page.
 
@@ -44,16 +43,16 @@ When creating a new entry to the blog, $progname uses the first line of the file
 Website: $progweb
 EOF
 }
-make_config()
+make_default_config()
 {
 cat > ./.$progname.config << EOF
 blogtitle="untitled"
 blogauthor="$(whoami)"
 font="sans"
-css="light"
+css="dark"
 #If using Busybox httpd applet, use http://127.0.0.1:8000 for webroot
 #If you're not using a webserver at all, use "." for webroot
-webroot="http://localhost:8000"
+webroot="."
 EOF
 }
 
@@ -62,18 +61,39 @@ get_config()
 if [ -e ./.$progname.config ];then
 	clear > /dev/null
 else
-	make_config
+	make_default_config
 fi
 source ./.$progname.config
+}
+
+set_config()
+{
+if [ -e ./.$progname.config ];then
+	source ./.$progname.config
+fi
+read -p "Blogtitle[$blogtitle]: " blogtitle
+read -p "Blog Author[$blogauthor]: " blogauthor
+read -p "Font[$font]: " font
+read -p "Stylesheet[$css]: " css
+webroot="."
+cat > ./.$progname.config << EOF
+blogtitle="$blogtitle"
+blogauthor="$blogauthor"
+font="$font"
+css="$css"
+#If using Busybox httpd applet, use http://127.0.0.1:8000 for webroot
+#If you're not using a webserver at all, use "." for webroot
+webroot="."
+EOF
 }
 
 init_blog()
 {
 get_config
-#A couple of CSS themes for the blog. Feel free to create your own as you see fit.
 if [ ! -e ./.$progname/ ];then
 	mkdir -p ./.$progname
 fi
+#A couple of CSS themes for the blog. Feel free to create your own as you see fit.
 cat > ./.$progname/light.css << EOF
 html{margin: 1em auto;max-width:40em;font:1.2em/1.62 $font;background-color: white;color: black}
 #rss{text-align: center;color: orange}
@@ -173,7 +193,7 @@ EOF
 
 gen_css_theme()
 {
-get_config
+mkdir -p ./.$progname
 cat >./.$progname/$1.css << EOF
 html{font-family: "$font";background-color: white;color: black}
 #rss{text-align: center;color: orange}
@@ -184,9 +204,13 @@ echo "./.$progname/$1.css created! Please edit this file to your liking."
 
 list_entries()
 {
+if [ -e ./.$progname/*.raw ];then
 for eachfile in ./.$progname/*.raw;do
 	echo "$(basename $eachfile .raw) - $(head -n1 $eachfile)"
 done
+else
+echo "Error: No blog entries exist."
+fi
 }
 
 if [ $# -lt 1 ];then
@@ -197,8 +221,7 @@ fi
 case "$1" in
 	-e|-edit) mkdir -p ./.$progname;vi .$progname/$2.raw;init_blog;;
 	-d|-delete) rm ./.$progname/$2.raw;init_blog;;
-	-i|-import) mkdir -p ./.$progname;cp $2 ./.$progname/$(basename $2 .txt).raw;init_blog;;
-	-c|-config) get_config;vi ./.$progname.config;;
+	-c|-config) set_config;init_blog;;
 	-C|-command) do_command "$2";init_blog;;
 	-l|-list) list_entries;;
 	-t|-theme) gen_css_theme "$2";;
